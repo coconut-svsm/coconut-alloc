@@ -64,8 +64,7 @@ impl<'a, 'b> PartsLockGuard<'a, 'b> {
     /// Returns a `[Result]` with the byte offset of the allocated region on success.
     /// On Failure an `Err(AllocError)` is returned. The error values carry the following meaning:
     ///
-    /// * `AllocError::Retry` - The atomic update of the chunk descriptor
-    ///    failed, re-read the descriptor and try again.
+    /// * `AllocError::Retry` - The atomic update of the chunk descriptor failed, re-read the descriptor and try again.
     /// * `AllocError::NoMem` - No more free parts available in this chunk.
     pub fn try_alloc(&mut self) -> Result<usize, AllocError> {
         let (bitmap, avail_mask) = self.get_bitmap_and_mask();
@@ -106,7 +105,7 @@ impl<'a, 'b> PartsLockGuard<'a, 'b> {
     /// When the `bool` is `true` then the bitmap was empty after freeing
     /// `offset`.
     pub fn free(&mut self, offset: usize) -> Result<bool, AllocError> {
-        assert!((offset % self.parts_desc.alloc_size) == 0);
+        assert!(offset.is_multiple_of(self.parts_desc.alloc_size));
 
         let (bitmap, avail_mask) = self.get_bitmap_and_mask();
         let bit = offset / self.parts_desc.alloc_size;
