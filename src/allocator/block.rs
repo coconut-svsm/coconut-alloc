@@ -220,7 +220,7 @@ impl<'a> AllocBlock {
         desc.index() * CHUNK_SIZE
     }
 
-    fn alloc_buddy_one(&self, order: u32) -> Result<AllocDesc, AllocError> {
+    fn alloc_buddy_one(&self, order: u32) -> Result<AllocDesc<'_>, AllocError> {
         // Minimal order observed in list
         let mut order_bitmap = 0;
 
@@ -241,7 +241,7 @@ impl<'a> AllocBlock {
         Err(AllocError::NoMatch(order_bitmap))
     }
 
-    fn alloc_buddy_desc(&self, order: u32) -> Result<AllocDesc, AllocError> {
+    fn alloc_buddy_desc(&self, order: u32) -> Result<AllocDesc<'_>, AllocError> {
         // Retry loop
         loop {
             let order_bmp_mask: u32 = !((1 << order) - 1);
@@ -295,7 +295,7 @@ impl<'a> AllocBlock {
         Self::free_buddy_desc(alloc_desc);
     }
 
-    fn find_parts_chunk(&self, size: usize) -> Result<PartsDesc, AllocError> {
+    fn find_parts_chunk(&self, size: usize) -> Result<PartsDesc<'_>, AllocError> {
         for desc in self.iter() {
             let raw_desc = desc?;
             if let Ok(parts_desc) = PartsDesc::try_from(raw_desc) {
@@ -308,7 +308,7 @@ impl<'a> AllocBlock {
         Err(AllocError::NoMatch(0))
     }
 
-    fn alloc_parts_chunk(&self, size: usize) -> Result<PartsDesc, AllocError> {
+    fn alloc_parts_chunk(&self, size: usize) -> Result<PartsDesc<'_>, AllocError> {
         // alloc_buddy() does not return AllocError::Retry
         let alloc_desc = self.alloc_buddy_desc(0)?;
         let parts_desc = alloc_desc.make_parts(size);
