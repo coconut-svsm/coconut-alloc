@@ -116,7 +116,7 @@ impl<'a> Iterator for ChunkIterator<'a> {
 }
 
 #[derive(Debug)]
-#[repr(C, packed(65536))]
+#[repr(C, align(65536))]
 pub struct AllocBlock {
     chunks: [Chunk; CHUNK_COUNT],
 }
