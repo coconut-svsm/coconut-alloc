@@ -4,7 +4,7 @@
 //
 // Author: Joerg Roedel <jroedel@suse.de>
 
-use super::super::{defs::*, AllocBlock, AllocError};
+use super::super::{AllocBlock, AllocError, defs::*};
 use super::parts::bitmap_in_desc;
 use super::{DescStorage, PartsDesc, RawDesc, RawDescType};
 

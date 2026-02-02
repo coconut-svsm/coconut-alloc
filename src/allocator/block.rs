@@ -4,11 +4,11 @@
 //
 // Author: Joerg Roedel <jroedel@suse.de>
 
+use super::AllocError;
 use super::defs::*;
 use super::descriptors::{
     AllocDesc, CompoundDesc, DescStorage, FreeDesc, MetaDesc, PartsDesc, RawDesc, RawDescType,
 };
-use super::AllocError;
 
 use core::cmp;
 use core::sync::atomic::{AtomicU32, Ordering};

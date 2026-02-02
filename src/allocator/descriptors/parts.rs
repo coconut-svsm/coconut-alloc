@@ -4,7 +4,7 @@
 //
 // Author: Joerg Roedel <jroedel@suse.de>
 
-use super::super::{defs::*, AllocError};
+use super::super::{AllocError, defs::*};
 use super::{AllocDesc, DescStorage, RawDesc, RawDescType};
 
 use core::mem;

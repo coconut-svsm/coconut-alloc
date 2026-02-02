@@ -4,7 +4,7 @@
 //
 // Author: Joerg Roedel <jroedel@suse.de>
 
-use super::super::{defs::MIN_ALLOC_SIZE, AllocError};
+use super::super::{AllocError, defs::MIN_ALLOC_SIZE};
 use super::RawDescType;
 
 const fn bit_mask(bits: u32) -> u32 {
