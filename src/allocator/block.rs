@@ -10,6 +10,7 @@ use super::descriptors::{
 };
 use super::AllocError;
 
+use core::alloc::Layout;
 use core::cmp;
 use core::sync::atomic::{AtomicU32, Ordering};
 
@@ -396,6 +397,39 @@ impl<'a> AllocBlock {
         ChunkIterator {
             block: self,
             next_index: 1,
+        }
+    }
+
+    /// Given an offset, try to reconstruct the corresponding allocation `Layout`
+    /// Returns `None` if the offset is outside the block or the descriptor  
+    /// does not represent a valid type of allocation.
+    pub fn layout_from_offset(&self, off: usize) -> Option<Layout> {
+        if off >= BLOCK_SIZE {
+            return None;
+        }
+        let index = off / CHUNK_SIZE;
+        let raw_desc = self.load_desc(index);
+        let Ok(raw_desc_type) = raw_desc.desc_type() else {
+            return None;
+        };
+
+        match raw_desc_type {
+            RawDescType::Alloc => {
+                if let Ok(alloc_desc) = AllocDesc::try_from(raw_desc) {
+                    let order = alloc_desc.get_order();
+                    let size = CHUNK_SIZE * (1 << order);
+                    return Layout::from_size_align(size, size).ok();
+                }
+                None
+            }
+            RawDescType::Parts => {
+                if let Ok(parts_desc) = PartsDesc::try_from(raw_desc) {
+                    let size = parts_desc.alloc_size();
+                    return Layout::from_size_align(size, size).ok();
+                }
+                None
+            }
+            _ => None,
         }
     }
 }
