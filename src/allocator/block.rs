@@ -4,11 +4,11 @@
 //
 // Author: Joerg Roedel <jroedel@suse.de>
 
+use super::AllocError;
 use super::defs::*;
 use super::descriptors::{
     AllocDesc, CompoundDesc, DescStorage, FreeDesc, MetaDesc, PartsDesc, RawDesc, RawDescType,
 };
-use super::AllocError;
 
 use core::cmp;
 use core::sync::atomic::{AtomicU32, Ordering};
@@ -171,12 +171,11 @@ impl<'a> AllocBlock {
     /// for sub-chunk-size allocations and where the allocation bitmap does not
     /// fit into the chunk descriptor.
     pub unsafe fn chunk_bitmap(&'a self, index: usize) -> &'a AtomicU32 {
-        self.chunks[index]
-            .data
-            .as_ptr()
-            .cast::<AtomicU32>()
-            .as_ref()
-            .unwrap()
+        let ptr = self.chunks[index].data.as_ptr().cast::<AtomicU32>();
+        // SAFETY: If the caller ensures the preconditions, the first bytes of
+        // the chunk are reserved for the bitmap and are correctly aligned,
+        // so the pointer is valid.
+        unsafe { ptr.as_ref().unwrap() }
     }
 
     fn make_compound_page(&mut self, index: usize, order: u32) {
